@@ -63,6 +63,7 @@ void loop() {
     display.print(F("Get\nready..."));
     display.display();
     //generate LED wait time
+    randomSeed(millis());
     waitTime = random(3, 8);
     delay(waitTime*1000);
     //indicate to the user that they can press the button now
