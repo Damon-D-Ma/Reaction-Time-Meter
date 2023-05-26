@@ -47,16 +47,25 @@ void setup() {
 }
 
 void loop() {
+
+
+  int cheat = 0;//checks if a player cheated or not
   //print start screen until initiated
   display.clearDisplay();
   display.setCursor(0,0);             // Start at top-left corner
   display.print(F("Press to\nstart test"));
   display.display();
-
   reactionTime = 0;
   buttonState = LOW;
   buttonState = digitalRead(BUTTON_PIN);
   if(buttonState == HIGH){
+    display.clearDisplay();
+    display.setCursor(0,0);             // Start at top-left corner
+    display.print(F("Release\nbutton to start test"));
+    display.display();
+    while(digitalRead(BUTTON_PIN) == HIGH){
+      delay(1);
+    }
     //print ready message
     display.clearDisplay();
     display.setCursor(0,0);             // Start at top-left corner
@@ -65,29 +74,45 @@ void loop() {
     //generate LED wait time
     randomSeed(millis());
     waitTime = random(3, 8);
-    delay(waitTime*1000);
-    //indicate to the user that they can press the button now
-    display.clearDisplay();
-    display.setCursor(0,0);             // Start at top-left corner
-    display.print(F("Go!"));
-    display.display();
-    digitalWrite(LED_PIN, HIGH);
-    startTime = millis();
-    buttonState = LOW;
-    //wait until user presses button
-    while(buttonState == LOW){
-      buttonState = digitalRead(BUTTON_PIN);
+    for(int i = 0; i < waitTime*1000; i++){
+      if (digitalRead(BUTTON_PIN) == HIGH){
+        cheat=1;
+        break;
+      }
+      delay(1);
     }
-    //display reaction time
-    endTime = millis();
-    digitalWrite(LED_PIN, LOW);
-    display.clearDisplay();
-    display.setCursor(0,0);
-    display.print("You took:\n");
-    display.print(endTime-startTime);
-    display.print(F(" ms"));
-    display.display();
-    delay(8000);
+    if(cheat == 1){
+      //display reaction time
+      endTime = millis();
+      digitalWrite(LED_PIN, LOW);
+      display.clearDisplay();
+      display.setCursor(0,0);
+      display.print("You\npressed\ntoo early!");
+      display.display();
+    }else{
+      //indicate to the user that they can press the button now
+      display.clearDisplay();
+      display.setCursor(0,0);             // Start at top-left corner
+      display.print(F("Go!"));
+      display.display();
+      digitalWrite(LED_PIN, HIGH);
+      startTime = millis();
+      buttonState = LOW;
+      //wait until user presses button
+      while(buttonState == LOW){
+        buttonState = digitalRead(BUTTON_PIN);
+      }
+      //display reaction time
+      endTime = millis();
+      digitalWrite(LED_PIN, LOW);
+      display.clearDisplay();
+      display.setCursor(0,0);
+      display.print("You took:\n");
+      display.print(endTime-startTime);
+      display.print(F(" ms"));
+      display.display();
+    }
+    delay(5000);
 
 
 
